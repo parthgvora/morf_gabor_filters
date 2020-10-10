@@ -5,9 +5,7 @@
 #include <cmath>
 #include <vector>
 
-#include <iostream>
-
-#define PI 3.141592654
+#define PI 3.1415926535897932384626433832795
 
 std::vector<std::vector<double>> gabor(int kwidth, int kheight, double sigma, double theta, double lambd, double gamma, double psi) {
    
@@ -52,12 +50,6 @@ std::vector<std::vector<double>> gabor(int kwidth, int kheight, double sigma, do
 
         kernel[ymax - y][xmax - x] = v;
             
-        /*
-        if( ktype == CV_32F )
-            kernel.at<float>(ymax - y, xmax - x) = (float)v;
-        else
-            kernel.at<double>(ymax - y, xmax - x) = v;
-        */
         }
     }
 
