@@ -1,3 +1,0 @@
-/home/parth/morf_gabor_filters/build/CMakeFiles/rebuild_cache.dir
-/home/parth/morf_gabor_filters/build/CMakeFiles/gabor.dir
-/home/parth/morf_gabor_filters/build/CMakeFiles/edit_cache.dir
