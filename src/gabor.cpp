@@ -1,6 +1,11 @@
+
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 #include <cmath>
 #include <vector>
+
+#include <iostream>
 
 #define PI 3.141592654
 
@@ -36,22 +41,25 @@ std::vector<std::vector<double>> gabor(int kwidth, int kheight, double sigma, do
     std::vector<std::vector<double>> kernel(kheight, std::vector<double> (kwidth, 0));
 
     // calculate values for kernel
-    for( int y = ymin; y <= ymax; y++ )
-        for( int x = xmin; x <= xmax; x++ )
-        {
-            double xr = x*c + y*s;
-            double yr = -x*s + y*c;
+    for( int y = ymin; y <= ymax; y++ ) {
+    
+        for( int x = xmin; x <= xmax; x++ ) {
+        
+        double xr = x*c + y*s;
+        double yr = -x*s + y*c;
 
-            double v = scale*std::exp(ex*xr*xr + ey*yr*yr)*cos(cscale*xr + psi);
-            kernel[y][x] = v;
+        double v = scale*std::exp(ex*xr*xr + ey*yr*yr)*cos(cscale*xr + psi);
+
+        kernel[ymax - y][xmax - x] = v;
             
-            /*
-            if( ktype == CV_32F )
-                kernel.at<float>(ymax - y, xmax - x) = (float)v;
-            else
-                kernel.at<double>(ymax - y, xmax - x) = v;
-            */
+        /*
+        if( ktype == CV_32F )
+            kernel.at<float>(ymax - y, xmax - x) = (float)v;
+        else
+            kernel.at<double>(ymax - y, xmax - x) = v;
+        */
         }
+    }
 
 
     return kernel;
