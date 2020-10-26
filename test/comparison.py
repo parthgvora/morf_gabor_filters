@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -9,22 +10,48 @@ from sklearn.ensemble import ObliqueForestClassifier
 from sporfdata import sparseparity, orthant, trunk
 
 def visualize_data():
-    x, y = sparseparity(1000, 2, 2)
+    """
+    Sparse Parity
+    """
+    x, y = sparseparity(1000)
     colours = {0:"red", 1:"blue"}
-    colourmap = [colours[i] for i in y]
-    plt.scatter(x[:, 0], x[:, 1], color=colourmap)
-    plt.savefig("sparse_parity")
+    
+    x_pos, y_pos = x[x[:, 2] > 0], y[x[:, 2] > 0]
+    x_neg, y_neg = x[x[:, 2] < 0], y[x[:, 2] < 0]
 
-    x, y = orthant(1000, 2)
-    colours = {0:"red", 1:"blue", 2:"green", 3:"yellow"}
-    colourmap = [colours[i] for i in y]
-    plt.scatter(x[:, 0], x[:, 1], color=colourmap)
-    plt.savefig("orthant")
+    plt.figure()
+    plt.scatter(x_pos[:, 0], x_pos[:, 1], color=[colours[i] for i in y_pos])
+    plt.savefig("sparse_parity_x3_pos")
 
+    plt.figure()
+    plt.scatter(x_neg[:, 0], x_neg[:, 1], color=[colours[i] for i in y_neg])
+    plt.savefig("sparse_parity_x3_neg")
+    
+    """
+    Orthant
+    """
+    x, y = orthant(1000, 3)
+    colours = {0:"red", 1:"blue", 2:"green", 3:"yellow",
+               4: "pink", 5:"gray", 6:"purple", 7:"brown"}
 
+    x_pos, y_pos = x[x[:, 2] > 0], y[x[:, 2] > 0]
+    x_neg, y_neg = x[x[:, 2] < 0], y[x[:, 2] < 0]
+
+    plt.figure()
+    plt.scatter(x_pos[:, 0], x_pos[:, 1], color=[colours[i] for i in y_pos])
+    plt.savefig("orthant_x3_pos")
+
+    plt.figure()
+    plt.scatter(x_neg[:, 0], x_neg[:, 1], color=[colours[i] for i in y_neg])
+    plt.savefig("orthant_x3_neg")
+ 
+    """
+    Trunk
+    """
     x, y = trunk(1000, 2)
     colours = {0:"red", 1:"blue"}
     colourmap = [colours[i] for i in y]
+    plt.figure()
     plt.scatter(x[:, 0], x[:, 1], color=colourmap)
     plt.savefig("trunk")
 
@@ -71,34 +98,35 @@ def test_RerF():
     
     print("Sparse Parity")
     for n in [1000, 5000, 10000]:
-        kwargs["feature_combinations"] = 3 
         sparse_acc, sparse_std = multitest(sparseparity, n, 3, rerfClassifier, **kwargs)
         print(n, sparse_acc)
+        break
 
     print("Orthant")
     for n in [400, 2000, 4000]:
         orth_acc, orth_std = multitest(orthant, n, 3, rerfClassifier, **kwargs)
         print(n, orth_acc)
+        break
 
 def test_OF():
 
     kwargs = {
             "n_estimators" : 100,
             "feature_combinations": 1.5,
-            "density": 1
+            "density": 0.5
     }
     
     print("Sparse Parity")
     for n in [1000, 5000, 10000]:
-        kwargs["density"] = 3/20
         sparse_acc, sparse_std = multitest(sparseparity, n, 3, ObliqueForestClassifier, **kwargs)
         print(n, sparse_acc)
+        break
 
     print("Orthant")
     for n in [400, 2000, 4000]:
-        kwargs["density"] = 3/6 
         orth_acc, orth_std = multitest(orthant, n, 3, ObliqueForestClassifier, **kwargs)
-        print(orth_acc)
+        print(n, orth_acc)
+        break
 
 
 
@@ -107,10 +135,10 @@ def main():
     #visualize_data()
     
     print("Random Forest")
-    test_RF()
+    #test_RF()
 
     print("Rerf")
-    test_RerF()
+    #test_RerF()
 
     print("Oblique Forest")
     test_OF()
