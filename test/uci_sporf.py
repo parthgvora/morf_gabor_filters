@@ -41,7 +41,7 @@ def test(data_file, reps, n_trees,
         acc = np.sum(y_test == y_hat) / len(y_test)
 
         chance_pred = 1 / n_classes
-        kappa[i] = (acc - chance_prd) / (1 - chance_pred)
+        kappa[i] = (acc - chance_pred) / (1 - chance_pred)
 
     return np.mean(kappa) * 100, (np.std(kappa) * 100) / np.sqrt(reps)
 
@@ -74,16 +74,15 @@ def main():
                              "feature_combinations" : feature_combinations,
                              "density" : density}}
 
-    RF_acc, RF_std = test(data_files[0], reps, n_trees,
+    RF_kappa, RF_err = test(data_files[0], reps, n_trees,
                             default_transformer_class=TreeClassificationTransformer,
                             default_transformer_kwargs=rf_kwargs)
 
-    OF_acc, OF_std = test(data_files[0], reps, n_trees,
+    OF_kappa, OF_err = test(data_files[0], reps, n_trees,
                             default_transformer_class=ObliqueTreeClassificationTransformer,
                             default_transformer_kwargs=of_kwargs)
-
-    print("RF acc, RF std:", RF_acc, RF_std)
-    print("OF acc, OF std:", OF_acc, OF_std)
+    print("RF kappa, RF err:", RF_acc, RF_std)
+    print("OF kappa, OF err:", OF_acc, OF_std)
 
 if __name__ == "__main__":
     main()
