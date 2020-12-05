@@ -1,14 +1,17 @@
 import numpy as np
 
-def sparseparity(n, p=20, p_star=3):
+def sparse_parity(n, p=20, p_star=3):
+
+    np.random.seed(12763123)
 
     X = np.random.uniform(-1, 1, (n, p))
     y = np.zeros(n)
 
     for i in range(0, n):
-        idx = np.where(X[i, :p_star] > 0)[0]
-        y[i] = len(idx) % 2
+        y[i] = sum(X[i, :p_star] > 0) % 2;
 
+
+    np.random.seed(None)
     return X, y
 
 def orthant(n, p=6):
