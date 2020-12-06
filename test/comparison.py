@@ -5,15 +5,16 @@ import matplotlib.pyplot as plt
 from rerf.rerfClassifier import rerfClassifier
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import ObliqueForestClassifier
+#from sklearn.ensemble import ObliqueForestClassifier
+from sklearn.model_selection import train_test_split
 
-from sporfdata import sparseparity, orthant, trunk
+from sporfdata import *
 
 def visualize_data():
     """
     Sparse Parity
     """
-    x, y = sparseparity(1000)
+    x, y = sparse_parity(1000)
     colours = {0:"red", 1:"blue"}
     
     x_pos, y_pos = x[x[:, 2] > 0], y[x[:, 2] > 0]
@@ -56,14 +57,27 @@ def visualize_data():
     plt.savefig("trunk")
 
 
+    """
+    Consistency
+    """
+    x, y = consistency(1000)
+    colours = {0:"red", 1:"blue"}
+    colourmap = [colours[i] for i in y]
+    plt.figure()
+    plt.scatter(x[:, 0], x[:, 1], color=colourmap)
+    plt.savefig("consistency")
+
+
 def multitest(data, n, iters, clf, **clf_kwargs):
 
     acc = np.zeros(iters)
     for i in range(0, iters):
 
         c = clf(**clf_kwargs)
-        X_train, y_train = data(n)
-        X_test, y_test = data(n)
+        X, y = data(n)
+        
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, shuffle=True, stratify=y)
+        print(X_train.shape, X_test.shape)
 
         c.fit(X_train, y_train)
         y_hat = c.predict(X_test)
@@ -79,8 +93,8 @@ def test_RF():
     }
 
     print("Sparse Parity")
-    for n in [1000, 5000, 10000]:
-        sparse_acc, sparse_std = multitest(sparseparity, n, 3, RandomForestClassifier, **kwargs)
+    for n in [1000, 5000]: #, 10000]:
+        sparse_acc, sparse_std = multitest(sparse_parity, n, 3, RandomForestClassifier, **kwargs)
         print(n, sparse_acc)
 
     print("Orthant")
@@ -93,20 +107,18 @@ def test_RerF():
     kwargs = {
             "n_estimators" : 100,
             "projection_matrix": "RerF",
-            "feature_combinations": 1.5
+            "feature_combinations": 1.5,
     }
     
     print("Sparse Parity")
-    for n in [1000, 5000, 10000]:
-        sparse_acc, sparse_std = multitest(sparseparity, n, 3, rerfClassifier, **kwargs)
+    for n in [1000, 5000]: #, 10000]:
+        sparse_acc, sparse_std = multitest(sparse_parity, n, 3, rerfClassifier, **kwargs)
         print(n, sparse_acc)
-        break
 
     print("Orthant")
     for n in [400, 2000, 4000]:
         orth_acc, orth_std = multitest(orthant, n, 3, rerfClassifier, **kwargs)
         print(n, orth_acc)
-        break
 
 def test_OF():
 
@@ -118,7 +130,7 @@ def test_OF():
     
     print("Sparse Parity")
     for n in [1000, 5000, 10000]:
-        sparse_acc, sparse_std = multitest(sparseparity, n, 3, ObliqueForestClassifier, **kwargs)
+        sparse_acc, sparse_std = multitest(sparse_parity, n, 3, ObliqueForestClassifier, **kwargs)
         print(n, sparse_acc)
         break
 
@@ -132,16 +144,16 @@ def test_OF():
 
 def main():
 
-    #visualize_data()
+    visualize_data()
     
-    print("Random Forest")
+    #print("Random Forest")
     #test_RF()
 
-    print("Rerf")
+    #print("Rerf")
     #test_RerF()
 
-    print("Oblique Forest")
-    test_OF()
+    #print("Oblique Forest")
+    #test_OF()
 
 
 if __name__ == "__main__":
