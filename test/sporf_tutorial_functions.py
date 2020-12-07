@@ -1,6 +1,8 @@
 import sys
 import numpy as np
 import pandas as pd
+import csv
+from numpy import genfromtxt
 
 from proglearn.progressive_learner import ProgressiveLearner
 from proglearn.voters import TreeClassificationVoter
@@ -9,6 +11,13 @@ from proglearn.transformers import ObliqueTreeClassificationTransformer
 from proglearn.deciders import SimpleArgmaxAverage
 
 from sklearn.model_selection import train_test_split, cross_val_score
+
+def load_simulated_data(file):
+    data = genfromtxt(file, delimiter=',')
+    X = data[:, :-1]
+    y = data[:, -1]
+
+    return X, y
 
 def load_data(data_file, task_num):
     if "Hill_Valley" in data_file:
