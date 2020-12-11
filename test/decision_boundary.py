@@ -10,35 +10,14 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import make_moons, make_circles, make_classification
 from sklearn.ensemble import RandomForestClassifier
 
-from proglearn.progressive_learner import ClassificationProgressiveLearner
+from proglearn.forest import LifelongClassificationForest
 from proglearn.voters import TreeClassificationVoter
 from proglearn.transformers import TreeClassificationTransformer
 from proglearn.transformers import ObliqueTreeClassificationTransformer
 from proglearn.deciders import SimpleArgmaxAverage
 
-of1_kwargs = {"kwargs": {"feature_combinations" : 1.5, "density": 0.75}}
-#of2_kwargs = {"kwargs": {"feature_combinations" : 1, "density": 0.75}}
 NT = 10
 
-pl1 = ClassificationProgressiveLearner(
-        default_transformer_class = ObliqueTreeClassificationTransformer,
-        default_transformer_kwargs = of1_kwargs,
-        default_voter_class = TreeClassificationVoter,
-        default_voter_kwargs = {},
-        default_decider_class = SimpleArgmaxAverage,
-        default_decider_kwargs = {"classes" : np.arange(2)}
-        )
-
-"""
-pl2 = ClassificationProgressiveLearner(
-        default_transformer_class = ObliqueTreeClassificationTransformer,
-        default_transformer_kwargs = of2_kwargs,
-        default_voter_class = TreeClassificationVoter,
-        default_voter_kwargs = {},
-        default_decider_class = SimpleArgmaxAverage,
-        default_decider_kwargs = {"classes" : np.arange(2)}
-        )
-"""
 h = .1  # step size in the mesh
 
 names = ["RF", "RerF", "Proglearn-SPORF"]
@@ -46,7 +25,7 @@ names = ["RF", "RerF", "Proglearn-SPORF"]
 classifiers = [
     RandomForestClassifier(max_depth=5, n_estimators=NT, max_features=1),
     rerfClassifier(n_estimators = NT, feature_combinations=1.5, max_features=2),
-    of1_kwargs]
+    LifelongClassificationForest(oblique=True, default_feature_combinations=1, default_density=0.5)]
 
 X, y = make_classification(n_features=2, n_redundant=0, n_informative=2,
                            random_state=1, n_clusters_per_class=1)
@@ -101,18 +80,10 @@ for ds_cnt, ds in enumerate(datasets):
         print(name)
 
         if "Proglearn" in name:
-            
-            kwargs = clf
-            clf = ClassificationProgressiveLearner(
-                default_transformer_class = ObliqueTreeClassificationTransformer,
-                default_transformer_kwargs = kwargs,
-                default_voter_class = TreeClassificationVoter,
-                default_voter_kwargs = {},
-                default_decider_class = SimpleArgmaxAverage,
-                default_decider_kwargs = {"classes" : np.arange(2)}
-            )
-            
-            clf.add_task(X_train, y_train, num_transformers=NT)
+           
+            clf = LifelongClassificationForest(oblique=True, 
+                    default_feature_combinations=1, default_density=0.5)
+            clf.add_task(X_train, y_train, n_estimators=NT)
             y_hat = clf.predict(X_test, task_id=0)
             score = np.sum(y_hat == y_test) / len(y_test)
 
